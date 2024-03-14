@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<html>
+<head>
+    <title>Flats</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css"
+          integrity="sha384-DhY6onE6f3zzKbjUPRc2hOzGAdEf4/Dz+WJwBvEYL/lkkIsI3ihufq9hk9K4lVoK" crossorigin="anonymous">
+    
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="../CSS/flats.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../JS/Users.js"></script>
+    <script src="../JS/utils.js"></script>
+    <script src="../JS/Flats.js"></script>
+    <script src="../JS/ajaxCalls.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#newFlatForm").submit(submitFlat);
+            getFlats();
+            $('#login-form').submit(signinUser);
+            $('#register-form').submit(signupUser);
+            $('#edit-form').submit(updateUserDetails)
+            updateUserMode();
+        })
+    </script>
+
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+        <img src="../Images/airbnb-logo.svg"/>
+        <a class="navbar-brand" href="#">Airbnb</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <!-- Sign-in button (visible if user is not logged in) -->
+                <li class="nav-item" id="sign-in-btn" style="display: none;">
+                    <button class="nav-link btn btn-link" onclick="showModal('signin')" style="width: auto;">Sign In</button>
+                </li>
+                <!-- Sign-up button (visible if user is not logged in) -->
+                <li class="nav-item" id="sign-up-btn" style="display: none;">
+                    <button class="nav-link btn btn-link" onclick="showModal('signup')" style="width: auto;">Sign Up</button>
+                </li>
+                <!-- My Account button (visible if user is logged in) -->
+                <li class="nav-item" id="my-account-btn" style="display: none;">
+                    <button class="nav-link btn btn-link" onclick="showModal('editModal')" style="width: auto;">Edit Account Details</button>
+                </li>
+                <!-- Admin page button (visible if Admin-user is logged in) -->
+                <li class="nav-item" id="admin-page-btn" style="display: none;">
+                    <a class="nav-link" href="admin.html">Manage Users</a>
+                </li>
+                <!-- Logout button (visible if user is logged in) -->
+                <li class="nav-item" id="logout-btn" style="display: none;">
+                    <button class="nav-link btn btn-link" onclick="logout()">Logout</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Navbar -->
+    <div class="container card-header">
+        <a id="add-flat-btn" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="collapse" href="#flatFormCollapse" role="button" aria-expanded="false" aria-controls="flatFormCollapse">
+            Add a new Flat
+        </a>
+    </div>
+
+    <div class="container collapse" id="flatFormCollapse">
+        <div class="card card-body">
+            <form id="newFlatForm">
+                <h2>Add a new Flat</h2>
+
+                <label for="city"><span class="red-star">* </span>City</label>
+                <div class="input-group mb-3">
+                    <input type="text" id="city" name="city" list="cities" required onchange="validateCityInput(this)">
+                    <datalist id="cities">
+                        <option value="Jerusalem"></option>
+                        <option value="Tel Aviv"></option>
+                        <option value="Haifa"></option>
+                        <option value="Rishon LeZion"></option>
+                        <option value="Petah Tikva"></option>
+                        <option value="Ashdod"></option>
+                        <option value="Netanya"></option>
+                        <option value="Beer Sheva"></option>
+                        <option value="Holon"></option>
+                    </datalist>
+                </div>
+                <label for="address"><span class="red-star">* </span>Address</label>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="address" name="address" placeholder="Enter the flat address" maxlength="25" required>
+                </div>
+                <label for="rooms"><span class="red-star">* </span>Number of Rooms</label>
+                <div class="input-group mb-3">
+                    <input type="number" class="form-control" id="rooms" name="rooms" placeholder="Enter number of rooms" min="1" step="0.5" max="8" required />
+                </div>
+                <label for="price"><span class="red-star">* </span>Price</label>
+                <div class="input-group mb-3">
+                    <input type="number" class="form-control" id="price" placeholder="Enter the price" required min="0" step="any" />
+                </div>
+                <input type="submit" value="Submit" class="btn btn-outline-primary" />
+            </form>
+        </div>
+    </div>
+
+    <div class="container card-header">
+        <a id="available-flats" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="collapse" href="#flatslistCollapse" role="button" aria-expanded="false" aria-controls="flatslistCollapse">
+            Available Flats 
+        </a>
+    </div>
+    <div class="container collapse" id="flatslistCollapse">
+        <div class="card card-body" id="flats-list">
+            <!-- Flats will be rendered here -->
+        </div>
+    </div>
+
+
+    <!-- Signin Modal-->
+    <div id="signin" class="modal">
+        <form id="login-form" class="modal-content animate">
+            <div class="imgcontainer">
+                <span onclick="document.getElementById('signin').style.display='none'" class="close" title="Close Modal">&times;</span>
+                <img src="../Images/airbnb-logo.svg" alt="Airbnb" class="avatar">
+                <h2>Sign In</h2>
+            </div>
+
+            <div class="container">
+                <label for="uname"><b>Username</b></label>
+                <input id="email" type="email" placeholder="Enter Username" name="uname" required>
+
+                <label for="psw"><b>Password</b></label>
+                <input id="pwd" type="password" placeholder="Enter Password" name="psw" required>
+
+                <input type="submit" value="Login" class="modalBtn btn btn-success" />
+            </div>
+
+            <div class="container" style="background-color: #f1f1f1">
+                <button type="button" onclick="document.getElementById('signin').style.display='none'" class="btn btn-danger">Cancel</button>
+                <span class="psw">Forgot <a href="#">password?</a></span>
+            </div>
+        </form>
+    </div>
+    <!-- Signin Modal-->
+    <!-- Signup Modal -->
+    <div id="signup" class="modal">
+        <form id="register-form" class="modal-content animate">
+            <div class="imgcontainer">
+                <span onclick="document.getElementById('signup').style.display='none'" class="close" title="Close Modal">&times;</span>
+                <img src="../Images/airbnb-logo.svg" alt="Airbnb" class="avatar">
+                <h2>Sign Up</h2>
+            </div>
+
+            <div class="container">
+                <label for="fname"><b>First Name</b></label>
+                <input id="reg-fname" type="text" placeholder="Enter First Name" name="fname" required>
+
+                <label for="lname"><b>Last Name</b></label>
+                <input id="reg-lname" type="text" placeholder="Enter Family Name" name="lname" required>
+
+                <label for="r_email"><b>Email</b></label>
+                <input id="reg-email" type="email" placeholder="Enter Email" name="r_email" required>
+
+                <label for="r_psw"><b>Password</b></label>
+                <input id="reg-pwd" type="password" placeholder="Enter Password" name="r_psw" minlength="5" maxlength="64" required>
+
+                <input type="submit" value="Register" class="modalBtn btn btn-success" />
+            </div>
+
+            <div class="container" style="background-color:#f1f1f1">
+                <button type="button" onclick="document.getElementById('signup').style.display='none'" class="btn btn-danger">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <!-- Signup Modal -->
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <form id="edit-form" class="modal-content animate">
+            <div class="imgcontainer">
+                <span onclick="document.getElementById('editModal').style.display='none'" class="close" title="Close Modal">&times;</span>
+                <img src="../Images/airbnb-logo.svg" alt="Airbnb" class="avatar">
+                <h2>Edit Account</h2>
+            </div>
+
+            <div class="container">
+                <label for="u-fname"><b>First Name</b></label>
+                <input id="edit-fname" type="text" placeholder="Enter First Name" name="u-fname" required>
+
+                <label for="u-lname"><b>Last Name</b></label>
+                <input id="edit-lname" type="text" placeholder="Enter Family Name" name="u-lname" required>
+
+                <label for="u-email"><b>Email</b></label>
+                <input id="edit-email" type="email" name="u-email" title="Email Address cannot be edited" readonly required>
+
+                <!-- Checkbox for changing password -->
+                <div>
+                    <label for="change-password-checkbox">Change Password</label>
+                    <input type="checkbox" id="change-password-checkbox" onchange="togglePasswordInput()" title="Password change is optional">
+                </div>
+                
+                
+                <!-- Password input field initially hidden -->
+                <div id="password-group" style="display: none;">
+                    <label for="u-psw"><b>New Password</b></label>
+                    <input id="edit-pwd" type="password" placeholder="Enter a new Password" name="u-psw">
+                </div>
+
+                <input type="submit" value="Save Changes" class="modalBtn btn btn-success" />
+            </div>
+
+            <div class="container" style="background-color:#f1f1f1">
+                <button type="button" onclick="document.getElementById('editModal').style.display='none'" class="btn btn-danger">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <!-- Edit Modal -->
+
+    <script>
+        var signinModal = document.getElementById('signin');
+        var signupModal = document.getElementById('signup');
+        var editModal = document.getElementById('editModal');
+        window.onclick = function (event) {
+            if (event.target == signinModal) {
+                signinModal.style.display = "none";
+            }
+            else if (event.target == signupModal) {
+                signupModal.style.display = "none";
+            }
+            else if (event.target == editModal) {
+                editModal.style.display = "none";
+            }
+        }
+
+        function showModal(modalId) {
+            // Hide all modals
+            $('.modal').hide();
+            $('#' + modalId).show();
+            if (modalId === 'editModal') {
+                initEditModal();
+            }
+        }
+
+        function initEditModal() {
+            var fullName = getPropertyFromSessionStorage('FullName');
+            var firstName = fullName?.FirstName ?? "";
+            var lastName = fullName?.FamilyName ?? "";
+            var email = getPropertyFromSessionStorage('Email') ?? "";
+
+            $("#edit-fname").val(firstName);
+            $("#edit-lname").val(lastName);
+            $("#edit-email").val(email);
+        }
+
+
+    </script>
+
+</body>
+</html>

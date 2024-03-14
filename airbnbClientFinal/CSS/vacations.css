@@ -1,0 +1,51 @@
+﻿h2 {
+    color: chocolate;
+}
+
+label {
+    font-weight: 700;
+}
+
+.red-star {
+    color: red;
+}
+
+div:where(.swal2-container) .swal2-html-container {
+    font-size: 1.7em;
+}
+
+#swal-msg, p.noRes {
+    color: red;
+    font-size: 1.5em;
+}
+
+    #swal-msg.vacation-not-found {
+        color: lightcoral;
+        font-size: 1.3em;
+    }
+
+span#footerSpan {
+    font-weight: bold;
+}
+
+.vacation {
+    border: solid;
+}
+
+.container {
+    margin-top: 35px;
+}
+
+.ui-datepicker {
+    width: 12em;
+}
+
+.custom-tooltip {
+    position: absolute;
+    background-color: bisque;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 50px;
+    z-index: 1000;
+    font-weight: bold;
+}

@@ -1,0 +1,27 @@
+﻿.adminOptionBtn {
+    font-size: 20px;
+    margin-bottom: 40px;
+    margin-top: 5px;
+    border: 1px solid;
+    text-align: center;
+    cursor: pointer;
+}
+
+.controlBtn {
+    margin-bottom: 15px;
+    margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+#usersTable_filter, div#usersTable_length {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+#logoImg {
+    margin-top: 10px;
+    margin-right: 10px;
+}

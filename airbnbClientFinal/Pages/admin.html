@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- datatables script -->
+    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+
+    <!-- datatables bootstrap script -->
+    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.bootstrap5.js"></script>
+
+    <!-- bootstrap style -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css"
+          integrity="sha384-DhY6onE6f3zzKbjUPRc2hOzGAdEf4/Dz+WJwBvEYL/lkkIsI3ihufq9hk9K4lVoK" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" />
+
+    <!-- datatables style css -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.bootstrap5.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="stylesheet" href="../CSS/admin.css" />
+
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="d-flex align-items-start flex-column bd-highlight mb-3">
+            <img id="logoImg" class="rounded float-start" src="../Images/airbnb-logo.svg" alt="AirbnbLogo" class="avatar">
+            <div class="mb-auto p-2 bd-highlight"><button class="btn btn-link" onclick="location.href='flats.html'"> Back to flats page </button></div>
+
+        </div>
+
+        <h1 class="display-4">Hello Admin!</h1>
+        <p class="lead">Choose one of the options down bellow</p>
+
+        <p>
+            <button class="btn btn-lg adminOptionBtn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReport" aria-expanded="false" aria-controls="collapseReport" title="Get a report of the avg price-per-night for group by cities">
+                Get Report
+            </button>
+            <button class="btn btn-lg adminOptionBtn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTable" aria-expanded="false" aria-controls="collapseTable" title="Get a datatable of all the users and activate/deactivate them">
+                Get Users Overview
+            </button>
+        </p>
+    </div>
+    <div class="collapse" id="collapseReport">
+        <div class="card card-body">
+            <!-- Report section -->
+            <div id="reportSectionCollapse" class="container ">
+                <div class="container">
+
+                    <label for="monthDropdown">Select a month:</label>
+                    <select id="monthDropdown">
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                    <button class="btn btn-secondary controlBtn" id="generateReportBtn" title="Click to generate the report">Generate Report</button>
+
+                    <div class="reportDiv" id="reportResults">
+                        <!-- Report results will be displayed here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="collapse" id="collapseTable">
+        <div class="card card-body">
+            <!-- Datatable section -->
+
+            <div id="tableDiv" class="container table-responsive">
+                <button class="btn btn-secondary controlBtn" id="manageUsersBtn" title="display a datatable of all the users">Manage Users</button>
+                <!-- Table to display users  -->
+                <table id="usersTable" class="table table-striped table-bordered table-hover" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Is Active?</th>
+
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="../JS/ajaxCalls.js"></script>
+    <script src="../JS/utils.js"></script>
+<script>
+        const users_uri = 'api/Users';
+        const localhost_port = 7045;
+        var local_server = `https://localhost:${localhost_port}/${users_uri}`;
+        var ruppin_server = `https://proj.ruppin.ac.il/cgroup66/test2/tar1/${users_uri}`;
+        const users_api = location.hostname === "localhost" || location.hostname === "127.0.0.1" ? local_server : ruppin_server;
+
+        $(document).ready(function () {
+
+            isLoggedInAdmin();
+
+            $('#manageUsersBtn').click(function () {
+                $(this).prop('disabled', true);
+                ajaxAuthCall("GET", `${users_api}/manage-users`, "", getUsersSuccess, getUsersError);
+            });
+
+            $('#generateReportBtn').click(function () {
+                var selectedMonth = $('#monthDropdown').val();
+                generateReport(selectedMonth);
+            });
+
+            $('#usersTable').on('click', '.activateBtn', handleActivateButtonClick);
+
+
+            $("button[data-bs-toggle='collapse']").click(function () {
+                // Close all visibile collapse elements.
+                $('.adminOptionBtn.btn-primary').removeClass('btn-primary');
+                $(this).addClass('btn-primary');
+                $(".collapse:visible").collapse('hide');
+            });
+
+            $(".collapse").on("shown.bs.collapse", function () {
+                var current = $(this);
+                $([document.documentElement, document.body]).animate(
+                    { scrollTop: current.offset().top },
+                    1000
+                );
+            });
+
+
+        });
+
+
+
+        function getUsersSuccess(response) {
+            $('#manageUsersBtn').prop('disabled', false);
+            // Clear existing table data
+            $('#usersTable').DataTable().clear().destroy();
+            let users = response.filter(user => !user.IsAdmin);
+            // Populate DataTable with user data
+            tbl = $('#usersTable').DataTable({
+                data: users,
+                pageLength: 10,
+                columns: [
+                    { data: 'FirstName' },
+                    { data: 'FamilyName' },
+                    { data: 'Email' },
+                    {
+                        data: 'IsActive',
+                        render: function (data, type, row) {
+                            return data != true ? "&#10007;" : "&#10003;";
+                        }
+                    },
+                    {
+                        render: function (data, type, row, meta) {
+                            let dataUser = "data-userMail='" + row.Email + "'";
+                            let btnText = row.IsActive ? "Deactivate" : "Activate";
+                            let btnType = row.IsActive ? "danger" : "success";
+                            let activateBtn = `<button type='button' class='activateBtn btn btn-${btnType}' ` + dataUser + ">" + btnText + "</button>";
+                            return activateBtn;
+                        }
+                    }
+                ]
+            });
+        }
+
+        function getUsersError(jqXHR, status, error) {
+            $('#manageUsersBtn').prop('disabled', false);
+            console.log('Error retrieving users:', error);
+            var msg = "";
+            var statusCode = jqXHR.status;
+            if (statusCode === 0) {
+                msg = 'Not connected.\nVerify Network. ';
+                console.error(msg);
+            }
+            else if (statusCode >= 400) {
+                msg = jqXHR.responseText;
+                console.error(`Server Error\nStatus: ${statusCode}.\nError Message: "${msg}"`);
+            }
+            else if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                console.error("Server Error:", jqXHR.responseJSON.error);
+            }
+            else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                console.error(msg);
+            }
+        }
+
+        function generateReport(month) {
+            let selectedMonth = parseInt(month);
+            $.ajax({
+                type: 'GET',
+                url: `${users_api}/reports/month?month=${selectedMonth}`,
+                data: "",
+                success: function (response) {
+                    displayReport(response);
+                },
+                error: getReportErrCB
+            });
+        }
+
+        function getReportErrCB(jqXHR, textStatus, errorThrown) {
+            var msg = "";
+            var statusCode = jqXHR.status;
+            if (statusCode === 0) {
+                msg = 'Not connected.\nVerify Network. ';
+                console.error(msg);
+            }
+            else if (statusCode >= 400) {
+                if (statusCode == 404) {
+                    return displayReport(new Array()); // if not results were returned from server
+                }
+
+                msg = jqXHR.responseText;
+                console.error(`Server Error\nStatus: ${statusCode}.\nError Message: "${msg}"`);
+            }
+            else if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                console.error("Server Error:", jqXHR.responseJSON.error);
+            }
+            else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                console.error(msg);
+            }
+        }
+
+        function displayReport(reportData) {
+            var month = $('#monthDropdown').val();
+            var monthName = $('#monthDropdown option:selected').text();
+            var reportResults = $('#reportResults');
+            reportResults.empty(); // Clear previous results
+
+            if (reportData.length == 0) {
+                return Swal.fire({
+                    icon: "error",
+                    title: "Sorry...",
+                    text: `No results have been found for month "${monthName}"`,
+                    footer: `<p id="swal-msg" class="vacation-not-found">Choose a different month and try again.</p>`
+                })
+            }
+
+            for (var i = 0; i < reportData.length; i++) {
+                var cityData = reportData[i];
+                var cityName = cityData.City;
+                var averagePrice = cityData.AveragePricePerNight;
+
+                var reportEntry = $('<div class="card card-body">').html(`<p><span><b>City Name:</b></span> ${cityName}</p><p><span><b>Average Price Per Night:</b></span> ${averagePrice}`);
+                reportResults.append(reportEntry);
+            }
+        }
+
+        function handleActivateButtonClick() {
+            var userEmail = $(this).data('usermail');
+            var action = $(this).text() === 'Deactivate' ? 'deactivate' : 'activate';
+
+            $.ajax({
+                type: 'PUT',
+                url: `${users_api}/manage-users/${action}?email=${userEmail}`,
+                data: "",
+                cache: false,
+                success: function (response) {
+                    ajaxAuthCall("GET", `${users_api}/manage-users`, "", getUsersSuccess, getUsersError);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error ' + status + ': ' + error);
+                    alert('Action failed! \nError ' + status + ': ' + error)
+                }
+            });
+        }
+
+        function isLoggedInAdmin() {
+            let isAdmin = getPropertyFromSessionStorage("IsAdmin");
+            if (!isAdmin) {
+                $(".container").hide();
+                return Swal.fire({
+                    icon: "error",
+                    title: "Oopsie Poopsie...",
+                    text: "Something went wrong!\nAre you sure you're an Admin?",
+                    footer: `<p id="swal-msg">If you are, please login to your *Admin* account before proceeding.</p>`
+                }).then(function () {
+                    window.location.href = 'flats.html';
+                });
+            }
+        }
+
+    </script>
+</body>
+</html>

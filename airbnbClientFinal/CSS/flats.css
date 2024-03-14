@@ -1,0 +1,210 @@
+﻿h2 {
+    color: #2a8ca5;
+}
+
+label {
+    font-weight: 700;
+}
+
+.red-star {
+    color: red;
+}
+
+div:where(.swal2-container) .swal2-html-container {
+    font-size: 1.7em;
+}
+
+#swal-msg {
+    color: red;
+    font-size: 1.5em;
+}
+
+.flat {
+    border: solid;
+}
+
+.container {
+    margin-top: 35px;
+}
+
+div:has(#newFlatForm) {
+    border: 1px solid #888;
+/*    width: 70%;*/
+}
+
+.card#newFlatForm {
+    width: 100%;
+}
+
+#flatFormCollapse {
+    margin-right: auto;
+    margin-left: auto;
+    width: 50%;
+}
+/* *********** navbar section ************ */
+.navbar {
+    background-color: #f8f9fa;
+    border: 1px solid black;
+    margin-left: auto;
+}
+
+.navbar-brand {
+    color: #007bff; 
+    font-weight: bold; 
+    padding-left: 16px;
+}
+
+.navbar img {
+    width: 40px;
+    height: auto;
+    margin-right: 5px;
+    margin-left: 10px;
+}
+
+.navbar-nav .nav-link {
+    color: #007bff; 
+    font-weight: bold; 
+}
+
+.navbar-nav .nav-link:hover {
+    color: #0056b3; /* Set hover color for links */
+}
+
+.navbar-toggler-icon {
+    border-color: #007bff; 
+}
+
+.sticky-top {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+/* ***********END of navbar section ************ */
+
+.modal input[type=text],
+.modal input[type=email],
+.modal input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.modal input[readonly] {
+    background-color:darkgray;
+}
+
+#change-password-checkbox {
+    padding: 12px 20px;
+    margin: 8px 0;
+}
+
+input.modalBtn{
+    padding: 5px 40px;
+    margin: 8px 0;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* Center the image and position the close button */
+.imgcontainer {
+    text-align: center;
+    margin: 24px 0 12px 0;
+    position: relative;
+}
+
+img.avatar {
+    max-width: 20%;
+    max-height: 80px;
+    padding: 8px;
+}
+
+.container {
+    padding: 16px;
+}
+
+span.psw {
+    float: right;
+    padding-top: 16px;
+}
+
+#flatInfoSpan {
+    font-weight: bold;
+    color: red;
+}
+
+.modal {
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+    border: 1px solid #888;
+    width: 50%;
+}
+
+.close {
+    position: absolute;
+    right: 25px;
+    top: 0;
+    color: #000;
+    font-size: 35px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: red;
+    cursor: pointer;
+}
+
+.animate {
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
+}
+
+@-webkit-keyframes animatezoom {
+    from {
+        -webkit-transform: scale(0)
+    }
+
+    to {
+        -webkit-transform: scale(1)
+    }
+}
+
+@keyframes animatezoom {
+    from {
+        transform: scale(0)
+    }
+
+    to {
+        transform: scale(1)
+    }
+}
+
+@media screen and (max-width: 300px) {
+    span.psw {
+        display: block;
+        float: none;
+    }
+
+    .cancelbtn {
+        width: 100%;
+    }
+}

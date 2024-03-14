@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Vacations</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css"
+          rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js">
+    </script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css"
+          integrity="sha384-DhY6onE6f3zzKbjUPRc2hOzGAdEf4/Dz+WJwBvEYL/lkkIsI3ihufq9hk9K4lVoK" crossorigin="anonymous">
+    <link rel="stylesheet" href="../CSS/vacations.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../JS/Vacations.js"></script>
+    <script src="../JS/ajaxCalls.js" asp-append-version="true"></script>
+    <script>
+        $(function () {
+            $("#datepicker").datepicker();
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js">
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            const selectedFlatId = sessionStorage.getItem('selectedFlatId');
+            const loggedInUser = sessionStorage.getItem('loggedIn');
+            const userId = sessionStorage.getItem('userDetails') != null ? JSON.parse(sessionStorage.getItem('userDetails'))['Email'] : "";
+
+            if (!loggedInUser) {
+                return Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: `<p id="swal-msg">Please login to your user account before proceeding.</p>`
+                }).then(function () {
+                    window.location.href = 'flats.html';
+                });
+            }
+
+            if (!selectedFlatId) {
+                return Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: `<p id="swal-msg">Please select a flat from the flats page before proceeding.</p>`
+                }).then(function () {
+                    window.location.href = 'flats.html';
+                });
+            }
+
+            displayVacationForm(selectedFlatId, userId);
+            resetVacationsList();
+            initializeDatePickers();
+
+        }); 
+    </script>
+</head>
+<body>
+    <div class="container">
+        <form id="newVacationForm">
+            <h2>Add a new Vacation</h2>
+
+            <label for="vacationId"><span class="red-star">* </span>Vacation Id</label>
+            <div class="input-group mb-3">
+                <input type="number" class="form-control" id="vacationId" name="vacationId" required min="0">
+            </div>
+
+            <label for="userId"><span class="red-star">* </span>User Id</label>
+            <div class="input-group mb-3">
+                <input type="email" class="form-control" id="userId" name="userId" readonly required>
+                <div class="input-group-append" data-tooltip="Fill out the 'UserId' to view the user's vacations">
+                    <button type="button" class="btn btn-outline-secondary" id="getVacationsBtn">Get All My Vacations</button> <!--type="button" to prevent submit-->
+                </div>
+            </div>
+
+            <label for="flatId"><span class="red-star">* </span>Flat Id</label>
+            <div class="input-group mb-3">
+                <input type="number" class="form-control" id="flatId" name="flatId" readonly required min="0">
+            </div>
+
+            <label for="startDate"><span class="red-star">* </span>Start Date</label>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control vacation-dates" id="startDate" name="startDate" autocomplete="off" placeholder="yyyy-mm-dd" required />
+            </div>
+
+            <label for="endDate"><span class="red-star">* </span>End Date</label>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control vacation-dates" id="endDate" name="endDate" autocomplete="off" placeholder="yyyy-mm-dd" required />
+            </div>
+            <input type="submit" value="Submit" class="btn btn-outline-primary" />
+            <a href="flats.html" class="btn btn-outline-danger">return to Flats page</a>
+        </form>
+    </div>
+
+    <div class="container" id="vacations-list">
+        <!-- Vacations will be rendered here -->
+    </div>
+
+<script>
+            $("#newVacationForm").hide();
+            $("#vacations-list").hide();
+            $('[data-tooltip]').hover(
+                function () {
+                    var tooltipText = $(this).attr('data-tooltip');
+                    if ($(':input[type="button"]').prop('disabled') == false) {
+                        tooltipText = "";
+                        return;
+                    }
+                    var tooltip = $('<div class="custom-tooltip"></div>').text(tooltipText).appendTo('body');
+                    var position = $(this).offset();
+                    var top = position.top - tooltip.outerHeight() - 5;
+                    var left = position.left + ($(this).outerWidth() - tooltip.outerWidth()) / 2;
+                    tooltip.css({ top: top, left: left }).fadeIn('fast');
+                },
+                function () {
+                    $('.custom-tooltip').remove();
+                }
+            );
+
+        </script>
+</body>
+</html>
